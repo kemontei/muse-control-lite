@@ -89,3 +89,13 @@ python MuseControlLite_train_audio_only.py
 # This set of adapters can then cooperate with the adapters trained with musical attribute conditions.
 ```
 In our experiment, usually, if using all the conditions that are used in training during inference, the FAD will be lower. Thus if you only need a certain conditions, then it is recommended just train that condition.
+
+## Cite this paper with 
+```
+@article{tsai2025musecontrollite,
+  title={MuseControlLite: Multifunctional Music Generation with Lightweight Conditioners},
+  author={Tsai, Fang-Duo and Wu, Shih-Lun and Lee, Weijaw and Yang, Sheng-Ping and Chen, Bo-Rui and Cheng, Hao-Chung and Yang, Yi-Hsuan},
+  journal={arXiv preprint arXiv:2506.18729},
+  year={2025}
+}
+```
