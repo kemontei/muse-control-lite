@@ -1,6 +1,6 @@
 def get_config():
     return {
-        "condition_type": ["melody_stereo"], #  you can choose any combinations in the two sets: ["dynamics", "rhythm", "melody_mono", "audio"],  ["melody_stereo", "audio"]
+        "condition_type": ["dynamics", "rhythm"], #  you can choose any combinations in the two sets: ["dynamics", "rhythm", "melody_mono", "audio"],  ["melody_stereo", "audio"]
                                     # When using audio, is recommend to use empty string "" as prompt
         "output_dir": "./generated_audio/output",
 
@@ -43,6 +43,7 @@ def get_config():
         "show_result_and_plt": True,
 
         "audio_files": [
+            #"melody_condition_audio/00Ng2LlBi9H5lJhXXkMjzi.wav",
             "melody_condition_audio/49_piano.mp3",
             "melody_condition_audio/49_piano.mp3",
             "melody_condition_audio/49_piano.mp3",
@@ -73,6 +74,8 @@ def get_config():
         # ],
 
         "text": [
+                "",
+                "Instrumental piano music with a constant melody throughout with accompanying instruments used to supplement the melody and does not contain drums. It helps with relaxation and falling asleep.",
                 "Electronic music that has a constant melody throughout with accompanying instruments used to supplement the melody which can be heard in possibly a casual setting",
                 "A heartfelt, warm acoustic guitar performance, evoking a sense of tenderness and deep emotion, with a melody that truly resonates and touches the heart.",     
                 "A vibrant MIDI electronic composition with a hopeful and optimistic vibe.",
