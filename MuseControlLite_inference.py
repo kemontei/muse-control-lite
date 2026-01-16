@@ -54,7 +54,7 @@ def main(config):
                     guidance_scale_con=config["guidance_scale_con"],
                     guidance_scale_audio=config["guidance_scale_audio"],
                     num_waveforms_per_prompt=1,
-                    audio_end_in_s=2097152 / 44100,
+                    audio_end_in_s=1323000 / 44100,
                     generator = torch.Generator().manual_seed(42)
                 ).audios 
                 # save audio
@@ -80,7 +80,7 @@ def main(config):
                     num_inference_steps=config["denoise_step"],
                     guidance_scale=config["guidance_scale_text"],
                     num_waveforms_per_prompt=1,
-                    audio_end_in_s=2097152/44100,
+                    audio_end_in_s=1323000/44100,
                     generator = torch.Generator().manual_seed(42)
                 ).audios
                 output = audio[0].T.float().cpu().numpy()

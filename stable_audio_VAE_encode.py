@@ -58,7 +58,7 @@ class AudioInversionDataset(Dataset):
             "audio": audio,
             "text": meta_entry['Qwen_caption'],
             "seconds_start": 0,
-            "seconds_end": 2097152 / 44100
+            "seconds_end": 1323000 / 44100
         }
         return example
     
@@ -67,7 +67,7 @@ class CollateFunction:
         self.condition_type = condition_type
         self.mode = mode  # "train" or "val"
     def __call__(self, examples):
-        audio = [example["audio"][:, :2097152] for example in examples]
+        audio = [example["audio"][:, :1323000] for example in examples]
         audio_full_path = [example["audio_full_path"] for example in examples]
         prompt_texts = [example["text"] for example in examples]
         seconds_start = [example["seconds_start"] for example in examples]

@@ -2,15 +2,19 @@ def get_config():
     return {
         # Load files and checkpoints
 
-        "condition_type": ["melody"], #"melody", "rhythm", "dynamics", "audio"
+        "condition_type": ["dynamics", "rhythm", "melody"], #"melody", "rhythm", "dynamics", "audio"
 
-        "meta_data_path": "./ALL_condition_wo_SDD.json",
+        #"meta_data_path": "./ALL_condition_wo_SDD.json",
+        "meta_data_path": "./test_condition.json",
 
-        "audio_data_dir": "../mtg_full_47s",
+        #"audio_data_dir": "../mtg_full_47s",
+        "audio_data_dir": "/home/kidrm2/workspace/braintwin/data/spotify_sleep_dataset/sleep_only_30s",
 
-        "audio_codec_root": "../mtg_full_47s_codec",
+        #"audio_codec_root": "../mtg_full_47s_codec",
+        "audio_codec_root": "",
 
-        "output_dir": "./checkpoints/stable_audio_melody_wo_SDD",
+        #"output_dir": "./checkpoints/stable_audio_melody_wo_SDD",
+        "output_dir": "./checkpoints/ssd",
 
         "transformer_ckpt": None, #"./checkpoints/stable_audio_melody_wo_SDD/checkpoint-5000/model_1.safetensors",
 
@@ -33,9 +37,11 @@ def get_config():
 
         "gradient_accumulation_steps": 4,
 
-        "max_train_steps": 200000,
+        #"max_train_steps": 200000,
+        "max_train_steps": 20000,
 
-        "num_train_epochs": 20,
+        #"num_train_epochs": 20,
+        "num_train_epochs": 10,
 
         "dataloader_num_workers": 16,
 

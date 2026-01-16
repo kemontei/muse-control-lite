@@ -749,7 +749,7 @@ def process_musical_conditions(config, audio_file, condition_extractors, output_
     Returns:
         tuple: (final_condition, extracted_condition, final_condition_audio)
     """
-    total_seconds = 2097152/44100
+    total_seconds = 1323000/44100
     use_audio_mask = False
     use_musical_attribute_mask = False
     if (config["audio_mask_start_seconds"] and config["audio_mask_end_seconds"]) != 0 and "audio" in config["condition_type"]:

@@ -7,7 +7,7 @@ import torchaudio
 import torch.nn.functional as F
 from torchaudio import transforms as T
 
-def load_audio_file(filename, target_sr=44100, target_samples=2097152):
+def load_audio_file(filename, target_sr=44100, target_samples=1323000):
     try:
         audio, in_sr = torchaudio.load(filename)    
         # Resample if necessary

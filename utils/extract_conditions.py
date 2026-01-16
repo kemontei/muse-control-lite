@@ -99,8 +99,8 @@ def compute_melody(input_audio):
     if sr != sample_rate:
         resample = torchaudio.transforms.Resample(orig_freq=sr, new_freq=sample_rate)
         wav = resample(wav)
-    # Truncate or pad the audio to 2097152 samples
-    target_length = 2097152
+    # Truncate or pad the audio to 1323000 samples
+    target_length = 1323000
     if wav.size(1) > target_length:
         # Truncate the audio if it is longer than the target length
         wav = wav[:, :target_length]
@@ -132,7 +132,7 @@ def compute_dynamics(audio_file, hop_length=160, target_sample_rate=44100, cut=T
         resampler = torchaudio.transforms.Resample(orig_freq=original_sample_rate, new_freq=target_sample_rate)
         waveform = resampler(waveform)
     if cut:
-        waveform = waveform[:, :2097152]
+        waveform = waveform[:, :1323000]
     # Ensure waveform has a single channel (e.g., select the first channel if multi-channel)
     waveform = waveform.mean(dim=0, keepdim=True)  # Mix all channels into one
     waveform = waveform.clamp(-1, 1).numpy()
