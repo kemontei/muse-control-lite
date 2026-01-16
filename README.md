@@ -62,18 +62,20 @@ Set `--audio_folder`, `--meta_path`, `--new_json`, and run:
 ```
 python extract_musical_attribute_conditions.py --audio_folder "../mtg_full_47s" --meta_path "./Qwen_caption.json" "--new_json" "./test_condition.json"
 python extract_musical_attribute_conditions_melody_stereo.py --audio_folder "../mtg_full_47s" --meta_path "./test_condition.json" "--new_json" "./test_condition_stereo_melody.json"
+python extract_musical_attribute_conditions.py --audio_folder "/home/kidrm2/workspace/braintwin/data/spotify_sleep_dataset/sleep_only_30s" --meta_path "/home/kidrm2/workspace/braintwin/text-to-music-dataset-preparation/filtered_vocal_all_caption.json" --new_json "./test_condition.json"
 ```
 This will extract the conditions so that you don't have to do it on the fly during training.
 ### VAE extraction
 The training code used preprocessed latents, so that we can skip the VAE encoding during training. To preprocess latents, run:
 ```
 python stable_audio_VAE_encode.py --audio_folder "../mtg_full_47s" --meta_path "./Qwen_caption.json" --latent_dir "./Jamendo_audio_47s_latent" --batch_size 1
+python stable_audio_VAE_encode.py --audio_folder "/home/kidrm2/workspace/braintwin/data/spotify_sleep_dataset/sleep_only_30s" --meta_path "test_condition.json" --latent_dir "./ssd_so_30s_latent" --batch_size 1
 ```
 ### MuseControlLite training
 We recommend training MuseControlLite with your own data, since the released checkpoints are only trained on the MTG-Jamendo dataset (mostly electronics). All training hyper-parameters could be found in `config_training.py`. 
 If you want to train a model that can deal with all musical attribute conditions, simply set `"condition_type": ["dynamics", "rhythm", "melody"]`, and run:
 ```
-python MuseControlLite_train_all.py
+python MuseControlLite_train_all.py #<---
 # You can try different combinations for the 'condition_type', the conditions that are not selected will be filled with zero as unconditioned. 
 # We found that training together with the audio condition produces unsatisfactory results.
 ```
