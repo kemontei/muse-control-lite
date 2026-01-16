@@ -18,7 +18,7 @@ def process_item(args):
         num_frames = audio_info.num_frames
         sample_rate = audio_info.sample_rate
 
-        assert num_frames == 2097152
+        assert num_frames == 1323000
         assert sample_rate == 44100
         assert melody_curve.shape == (8, 4097)
 

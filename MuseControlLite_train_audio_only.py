@@ -85,7 +85,7 @@ class AudioInversionDataset(Dataset):
             "audio_full_path": audio_full_path,
             "audio": audio,
             "seconds_start": 0,
-            "seconds_end": 2097152 / 44100,
+            "seconds_end": 1323000 / 44100,
         }
         return example
     
@@ -141,7 +141,7 @@ def log_validation(val_dataloader, condition_type, pipeline, config, weight_dtyp
                 prompt=prompt_texts,
                 negative_prompt=[""],
                 num_inference_steps=config["denoise_step"],
-                audio_end_in_s=2097152/44100,
+                audio_end_in_s=1323000/44100,
                 num_waveforms_per_prompt=1,
                 generator=generator,
             ).audios

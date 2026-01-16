@@ -98,6 +98,7 @@ class AudioInversionDataset(Dataset):
         # Load audio tokens, they are encoded with the Stable-audio VAE and saved, skipping the the VAE encoding process saves memory when training MuseControlLite
         audio_full_path = os.path.join(self.audio_data_root, audio_path)
         audio_token_path = os.path.join(self.audio_codec_root, audio_path.replace('mp3', 'pth'))
+        print("Audio token path:", audio_token_path)
         audio = torch.load(audio_token_path, map_location=torch.device('cpu'))
         
         example = {
@@ -106,7 +107,7 @@ class AudioInversionDataset(Dataset):
             "audio": audio,
             "melody_curve": melody_curve,
             "seconds_start": 0,
-            "seconds_end": 2097152 / 44100,
+            "seconds_end": 1323000 / 44100,
         }
         return example
     
@@ -194,7 +195,7 @@ def log_validation(val_dataloader, condition_extractors, condition_type, pipelin
                 prompt=prompt_texts,
                 negative_prompt=[""],
                 num_inference_steps=config["denoise_step"],
-                audio_end_in_s=2097152/44100,
+                audio_end_in_s=1323000/44100,
                 num_waveforms_per_prompt=1,
                 generator=generator,
             ).audios

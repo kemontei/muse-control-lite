@@ -86,17 +86,20 @@ class AudioInversionDataset(Dataset):
         def load_npy(path):
             return np.load(path) 
         if "melody" in self.config['condition_type']:
-            melody_path = build_path("../mtg_full_47s_conditions/filtered_no_singer_melody_test_new_v2", audio_path)
+            #melody_path = build_path("../mtg_full_47s_conditions/filtered_no_singer_melody_test_new_v2", audio_path)
+            melody_path = build_path("./melody_condition_dir", audio_path)
             melody_curve = load_npy(melody_path)
         else:
             melody_curve = np.zeros((128, 4097))
         if "rhythm" in self.config['condition_type']:
-            rhythm_path = build_path("../mtg_full_47s_conditions/filtered_no_singer_rhythm_test", audio_path)
+            #rhythm_path = build_path("../mtg_full_47s_conditions/filtered_no_singer_rhythm_test", audio_path)
+            rhythm_path = build_path("./rhythm_condition_dir", audio_path)
             rhythm_curve = load_npy(rhythm_path)
         else:
             rhythm_curve = np.zeros((4756, 2))
         if "dynamics" in self.config['condition_type']:
-            dynamics_path = build_path("../mtg_full_47s_conditions/filtered_no_singer_dynamics_test", audio_path)
+            #dynamics_path = build_path("../mtg_full_47s_conditions/filtered_no_singer_dynamics_test", audio_path)
+            dynamics_path = build_path("./dynamics_condition_dir", audio_path)
             dynamics_curve = load_npy(dynamics_path)
         else:
             dynamics_curve = np.zeros((13108,))
@@ -104,6 +107,7 @@ class AudioInversionDataset(Dataset):
         # Load audio tokens, they are encoded with the Stable-audio VAE and saved, skipping the the VAE encoding process saves memory when training MuseControlLite
         audio_full_path = os.path.join(self.audio_data_root, audio_path)
         audio_token_path = os.path.join(self.audio_codec_root, audio_path.replace('mp3', 'pth'))
+        print("Audio token path:", audio_token_path)
         audio = torch.load(audio_token_path, map_location=torch.device('cpu'))
         
         example = {
@@ -114,7 +118,7 @@ class AudioInversionDataset(Dataset):
             "rhythm_curve": rhythm_curve,
             "dynamics_curve": dynamics_curve,
             "seconds_start": 0,
-            "seconds_end": 2097152 / 44100,
+            "seconds_end": 1323000 / 44100,
         }
         return example
     
@@ -242,6 +246,14 @@ def log_validation(val_dataloader, condition_extractors, condition_type, pipelin
         masked_extracted_dynamics_condition = torch.full_like(extracted_dynamics_condition.to(torch.float32), fill_value=0)
         masked_extracted_rhythm_condition = torch.full_like(extracted_rhythm_condition.to(torch.float32), fill_value=0)
         masked_extracted_audio_condition = torch.full_like(extracted_audio_condition.to(torch.float32), fill_value=0)
+        
+        print("Masked extracted audio condition:", masked_extracted_audio_condition)
+        print("Masked extracted audio condition shape:", masked_extracted_audio_condition.shape)
+        print("Checking sum of elements is 0. Sum:", torch.sum(masked_extracted_audio_condition))
+        assert torch.sum(masked_extracted_audio_condition) == torch.tensor([0.]).to("cuda")
+        print("Masked extracted audio condition contains all zero")
+        masked_extracted_audio_condition = torch.zeros((1, 192, 1024)).to("cuda")
+        print(masked_extracted_audio_condition.shape)
          
         extracted_rhythm_condition = F.interpolate(extracted_rhythm_condition, size=1024, mode='linear', align_corners=False)
         extracted_dynamics_condition = F.interpolate(extracted_dynamics_condition, size=1024, mode='linear', align_corners=False)
@@ -261,6 +273,11 @@ def log_validation(val_dataloader, condition_extractors, condition_type, pipelin
             extracted_dynamics_condition[:,:,512:] = 0
             extracted_audio_condition[:,:,:512] = 0
         # extracted_audio_condition[:,:,:] = 0 # pause audio condition
+        print("Pause audio condition")
+        print(extracted_audio_condition.shape)
+        extracted_audio_condition = torch.zeros((1, 192, 1024)).to("cuda")
+        print(extracted_audio_condition.shape)
+
         extracted_condition = torch.concat((extracted_rhythm_condition, extracted_dynamics_condition, extracted_melody_condition, extracted_audio_condition), dim=1)
         masked_extracted_condition = torch.concat((masked_extracted_rhythm_condition, masked_extracted_dynamics_condition, masked_extracted_melody_condition, masked_extracted_audio_condition), dim=1)
         extracted_condition = torch.concat((masked_extracted_condition, masked_extracted_condition, extracted_condition), dim=0)
@@ -276,7 +293,7 @@ def log_validation(val_dataloader, condition_extractors, condition_type, pipelin
                 prompt=prompt_texts,
                 negative_prompt=[""],
                 num_inference_steps=config["denoise_step"],
-                audio_end_in_s=2097152/44100,
+                audio_end_in_s=1323000/44100,
                 num_waveforms_per_prompt=1,
                 generator=generator,
             ).audios
@@ -604,6 +621,7 @@ def main():
             with accelerator.accumulate(transformer, *condition_extractor_values if condition_extractor_values is not None else transformer):
                 # Convert audios to latent space
                 latents = batch["audio"]
+                print(f"Latents (audio) shape: {latents.shape}")
                 bsz, channels, height = latents.shape
                 # Sample a random timestep for each image using uniform distribution
                 t = torch.sigmoid(torch.randn(bsz)).cuda()
@@ -695,6 +713,9 @@ def main():
                 if "audio" not in config['condition_type']:
                     extracted_audio_condition[:,:,:] = 0
                     print("not using auio")
+                    print(extracted_audio_condition.shape)
+                    extracted_audio_condition = torch.zeros((8, 192, 1024)).to("cuda")
+                    print(extracted_audio_condition.shape)
                 with torch.no_grad():
                     prompt_embeds = pipeline.encode_prompt(
                         prompt=prompt_texts,
@@ -717,6 +738,13 @@ def main():
                 text_audio_duration_embeds = torch.cat(
                     [prompt_embeds, seconds_start_hidden_states, seconds_end_hidden_states], dim=1
                 ) 
+
+                print("Condition shapes:")
+                print(f"Extracted rhythm condition: {extracted_rhythm_condition.shape}")
+                print(f"Extracted dynamics condition: {extracted_dynamics_condition.shape}")
+                print(f"Extracted melody condition: {extracted_melody_condition.shape}")
+                print(f"Extracted audio condition: {extracted_audio_condition.shape}")
+                
                 extracted_condition = torch.concat((extracted_rhythm_condition, extracted_dynamics_condition, extracted_melody_condition, extracted_audio_condition), dim=1)
                 extracted_condition = extracted_condition.transpose(1, 2)
                 # This rotary_embedding is for self attention layers in Stable-audio 
