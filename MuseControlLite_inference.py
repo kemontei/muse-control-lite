@@ -55,7 +55,7 @@ def main(config):
                     guidance_scale_audio=config["guidance_scale_audio"],
                     num_waveforms_per_prompt=1,
                     audio_end_in_s=1323000 / 44100,
-                    generator = torch.Generator().manual_seed(42)
+                    generator = torch.Generator().manual_seed(config["seed"])
                 ).audios 
                 # save audio
                 gen_file_path = os.path.join(output_dir, f"test_{i}.wav")
@@ -81,7 +81,7 @@ def main(config):
                     guidance_scale=config["guidance_scale_text"],
                     num_waveforms_per_prompt=1,
                     audio_end_in_s=1323000/44100,
-                    generator = torch.Generator().manual_seed(42)
+                    generator = torch.Generator().manual_seed(config["seed"])
                 ).audios
                 output = audio[0].T.float().cpu().numpy()
                 file_path = os.path.join(output_dir, f"{prompt_texts}.wav")
@@ -97,5 +97,15 @@ def main(config):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="AP-adapter Inference Script")
+    parser.add_argument("--seed", type=int, default=42, help="Set seed value")
+    args = parser.parse_args()  # Parse the arguments
+
     config = get_config()  # Pass the parsed arguments to get_config
+    if "seed" in config:
+        print(f"Changing seed from {config['seed']} to {args.seed}")
+        config["seed"] = args.seed
+    else:
+        print(f"Setting seed to {args.seed}")
+        config["seed"] = args.seed
+
     main(config)
